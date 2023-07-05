@@ -7,6 +7,8 @@ A simple colorbot with trigger and aimbot functionality using BitBlt to capture 
 To record colors; simply press INSERT once to start the recording and hold mouse5 to begin recording the colors that are located at the cursors position.   
 To exclude colors; simply hold HOME while pressing mouse5 to exclude colors at the cursors position.   
 
+Activate the trigger and aim with mouse5(currently the aimbot code is very simple as it only works on 3x3 pixels - I'd recommend making the rectangle bigger for the aimbot implementation, as it's quite unnoticeable as it is.
+
 Here is a video, where I showcase it: 
 
 [colorbot video](https://streamable.com/gn5vzg)
