@@ -9,13 +9,13 @@
 #include <vector>
 #include <thread>
 #include <algorithm>
-#include "skCrypter.h"
 
-constexpr int threshold = 2; // Smaller value means more specific colors
+constexpr int threshold = 3; // Smaller value means more specific colors
 constexpr int scanDelay = 1; // Delay between each screen scan (in milliseconds)
 constexpr int pixelRange = 1; // -1, 0, 1 makes a 3x3 grid
 constexpr int delay = 0; // Delay for after-shoot (in milliseconds)
-constexpr int afterShootDelay = 325; // Delay for after-shoot (in milliseconds)
+constexpr int afterShootDelay = 225; // Delay for after-shoot (in milliseconds)
+constexpr int cursorSpeedThreshold = 1; // Threshold for cursor speed (adjust as needed) 
 
 bool isButton5Down()
 {
@@ -90,20 +90,20 @@ int main()
             {
                 recordingStarted = true;
                 recordedColors.clear();
-                std::cout << skCrypt("Recording started. Press INSERT again to stop recording.").decrypt() << std::endl;
+                std::cout << "Recording started. Press INSERT again to stop recording." << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
             else if (recordingStarted && !recordingStopped)
             {
                 recordingStarted = false;
                 recordingStopped = true;
-                std::cout << skCrypt("Recording stopped. Recorded colors:").decrypt() << std::endl;
+                std::cout << "Recording stopped. Recorded colors:" << std::endl;
                 for (const auto& color : recordedColors)
                 {
                     BYTE red = GetRValue(color);
                     BYTE green = GetGValue(color);
                     BYTE blue = GetBValue(color);
-                    std::cout << skCrypt("Red: ").decrypt() << static_cast<int>(red) << skCrypt(", Green: ").decrypt() << static_cast<int>(green) << skCrypt(", Blue: ").decrypt() << static_cast<int>(blue) << std::endl;
+                    std::cout << "Red: " << static_cast<int>(red) << ", Green: " << static_cast<int>(green) << ", Blue: " << static_cast<int>(blue) << std::endl;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
             }
@@ -130,17 +130,17 @@ int main()
                         excludedColors.push_back(pixelColor);
                     }
 
-                    // Remove color from the good list if it's there
+                    // Remove color from the recorded list if it's there
                     auto it = std::find(recordedColors.begin(), recordedColors.end(), pixelColor);
                     if (it != recordedColors.end())
                     {
                         recordedColors.erase(it);
-                        std::cout << skCrypt("Color removed from the good list.").decrypt() << std::endl;
+                        std::cout << "Color removed from the good list." << std::endl;
                     }
                 }
             }
 
-            std::cout << skCrypt("Colors added to the exclusion list.").decrypt() << std::endl;
+            std::cout << "Colors added to the exclusion list." << std::endl;
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
 
@@ -152,6 +152,16 @@ int main()
 
         // Calculate the cursor speed
         double cursorSpeed = static_cast<double>(cursorDistance) / scanDelay;
+
+        // If the cursor speed is below the threshold, allow sending inputs
+        if (cursorSpeed <= cursorSpeedThreshold)
+        {
+            shouldSendInputs = true;
+        }
+        else
+        {
+            shouldSendInputs = false;
+        }
 
         lastCursorPosition = cursorPos;
 
@@ -168,7 +178,7 @@ int main()
                 if (std::find(recordedColors.begin(), recordedColors.end(), detectedColor) == recordedColors.end())
                 {
                     recordedColors.push_back(detectedColor);
-                    std::cout << skCrypt("Color recorded.").decrypt() << std::endl;
+                    std::cout << "Color recorded." << std::endl;
                 }
             }
 
@@ -176,14 +186,14 @@ int main()
 
             if (colorDetected && !recordingStarted)
             {
-                std::cout << skCrypt("Target color detected within the rectangle.").decrypt() << std::endl;
+                std::cout << "Target color detected within the rectangle." << std::endl;
 
                 // Prediction logic
                 POINT movementDirection = { detectedPos.x - lastDetectedPos.x, detectedPos.y - lastDetectedPos.y };
                 detectedPos.x += movementDirection.x * extraSteps;
                 detectedPos.y += movementDirection.y * extraSteps;
                 lastDetectedPos = detectedPos;
-                
+
                 if (shouldSendInputs)
                 {
                     // Relative cursor movement
