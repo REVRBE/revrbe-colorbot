@@ -21,4 +21,6 @@ Also, it has false-positives where it detect a color which is near/very close to
 
 But I recommend maybe doing a bigger rectangle horizontally and analyzing the detected colors and check how many pixels the colors stretch across - this way it could bring down false-positives as it would just ignore those pixels where the color-area is very small. Anyway, have fun with the repository :)  
 
-For some god damn reason the code suddenly stopped working - without even changing anything... Will try to update/fix it when I have time.
+### Update 
+
+I fixed the mistake I made, it now works fine.
